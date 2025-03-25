@@ -214,14 +214,32 @@
       // Add event listener to the Apply All button
       const applyAllButton = header.querySelector('.apply-all-btn');
       if (applyAllButton) {
-        applyAllButton.addEventListener('click', () => {
+        applyAllButton.addEventListener('click', async () => {
           const fileItems = fileChangesContainer.querySelectorAll('.file-change-item');
-          fileItems.forEach(item => {
+          for (const item of fileItems) {
             const replaceButton = item.querySelector('.replace-code-btn');
             if (replaceButton) {
-              replaceButton.click();
+              // Get the file details from the item's dataset
+              const filePath = item.dataset.filePath;
+              const fileOperation = item.dataset.fileOperation;
+              const fileCode = item.dataset.fileCode;
+              const workspaceName = item.dataset.workspaceName;
+              const workspaceRoot = item.dataset.workspaceRoot;
+              
+              // Send message to extension to replace code
+              vscode.postMessage({
+                command: 'replaceCode',
+                filePath,
+                fileOperation,
+                fileCode,
+                workspaceName,
+                workspaceRoot
+              });
+              
+              // Wait a short delay to allow the operation to complete
+              await new Promise(resolve => setTimeout(resolve, 100));
             }
-          });
+          }
         });
       }
       
@@ -366,6 +384,7 @@
     // Message handling from the extension
     window.mergeTab = {
       onMessage: function(message) {
+        console.log('mergeTab received message:', message);
         if (message.command === 'updateMergeContent') {
           if (mergeTextarea) {
             mergeTextarea.value = message.content;
@@ -373,11 +392,16 @@
           }
         } else if (message.command === 'codeReplaced') {
           // Handle confirmation of code replacement
-          const { filePath, displayPath, success } = message;
+          const { filePath, displayPath, success, fileOperation } = message;
+          console.log('Received codeReplaced message:', { filePath, displayPath, success, fileOperation });
+          
+          // Find all buttons with this file path
           const buttons = document.querySelectorAll(`.replace-code-btn[data-file-path="${filePath}"]`);
+          console.log('Found buttons:', buttons.length);
           
           buttons.forEach(button => {
             if (success) {
+              console.log('Updating button to success state');
               button.textContent = 'Applied';
               button.disabled = true;
               button.classList.remove('error');
@@ -411,6 +435,7 @@
                 }
               }
             } else {
+              console.log('Updating button to error state');
               button.textContent = 'Failed';
               button.classList.add('error');
             }
@@ -575,7 +600,11 @@
     
     .disabled {
       opacity: 0.5;
-      cursor: not-allowed;
+      cursor: not-allowed !important;
+    }
+
+    button:disabled {
+      cursor: not-allowed !important;
     }
   `;
   document.head.appendChild(styleElement);

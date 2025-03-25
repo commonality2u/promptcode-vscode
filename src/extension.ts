@@ -344,10 +344,19 @@ export function activate(context: vscode.ExtensionContext) {
 				// Use workspace name and file path for display
 				const displayPath = workspaceName ? `${workspaceName}: ${filePath}` : filePath;
 				
+				console.log('Sending codeReplaced message:', {
+					command: 'codeReplaced',
+					filePath,
+					displayPath,
+					fileOperation,
+					success: true
+				});
+				
 				promptCodeProvider._panel.webview.postMessage({
 					command: 'codeReplaced',
 					filePath,
 					displayPath,
+					fileOperation,
 					success: true
 				});
 				
@@ -363,10 +372,19 @@ export function activate(context: vscode.ExtensionContext) {
 			
 			// Notify the webview that the operation failed
 			if (promptCodeProvider._panel) {
+				console.log('Sending codeReplaced error message:', {
+					command: 'codeReplaced',
+					filePath: message.filePath,
+					displayPath: message.filePath,
+					fileOperation: message.fileOperation,
+					success: false
+				});
+				
 				promptCodeProvider._panel.webview.postMessage({
 					command: 'codeReplaced',
 					filePath: message.filePath,
 					displayPath: message.filePath,
+					fileOperation: message.fileOperation,
 					success: false
 				});
 			}

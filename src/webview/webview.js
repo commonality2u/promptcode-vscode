@@ -350,6 +350,13 @@
               }
               break;
 
+          case 'codeReplaced':
+              // Pass message to the merge tab
+              if (window.mergeTab && typeof window.mergeTab.onMessage === 'function') {
+                window.mergeTab.onMessage(message);
+              }
+              break;
+
           default:
               // no-op
               break;

@@ -55,6 +55,7 @@ export class PromptCodeWebViewProvider {
         this._panel.webview.onDidReceiveMessage(
             message => {
                 console.log('WebView message received:', message);
+
                 switch (message.command) {
                     case 'search':
                         console.log('Search command received in webview provider, searchTerm:', message.searchTerm);
@@ -202,6 +203,10 @@ export class PromptCodeWebViewProvider {
                         console.log('OpenPromptFile command received with prompt name:', message.promptName);
                         this.openPromptFile(message.promptName, message.filePath);
                         return;
+                    case 'updateMergeContent':
+                        console.log('Update Merge Content command received in webview provider');
+                        vscode.commands.executeCommand('promptcode.updateMergeContent', message.content);
+                        return;
                     case 'applyMerge':
                         console.log('Apply Merge command received in webview provider', message);
                         vscode.commands.executeCommand('promptcode.applyMerge', message.content);
@@ -217,6 +222,14 @@ export class PromptCodeWebViewProvider {
                     case 'showDiff':
                         console.log('ShowDiff command received in webview provider with path:', message.filePath);
                         vscode.commands.executeCommand('promptcode.showDiff', message);
+                        return;
+                    case 'codeReplaced':
+                        console.log('Code Replaced message received in webview provider', message);
+                        // Forward the message back to the webview
+                        if (this._panel) {
+                            console.log('Forwarding codeReplaced message to webview:', message);
+                            this._panel.webview.postMessage(message);
+                        }
                         return;
                 }
             },
