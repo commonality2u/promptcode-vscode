@@ -31,6 +31,9 @@ export class TelemetryService {
         if (CONNECTION_STRING) {
             this.reporter = new TelemetryReporter(CONNECTION_STRING);
             context.subscriptions.push(this.reporter);
+            console.log(`Telemetry reporter initialized with connection string: ${CONNECTION_STRING ? 'present' : 'missing'}`);
+        } else {
+            console.log('Telemetry disabled: No connection string available');
         }
 
         // Check if telemetry is disabled in extension settings
@@ -38,16 +41,25 @@ export class TelemetryService {
         this.updateExtensionTelemetrySetting();
 
         // Listen for changes to the extension's settings
-        vscode.workspace.onDidChangeConfiguration(e => {
-            if (e.affectsConfiguration('promptcode.enableTelemetry')) {
-                this.updateExtensionTelemetrySetting();
-            }
-        });
+        context.subscriptions.push(
+            vscode.workspace.onDidChangeConfiguration(e => {
+                if (e.affectsConfiguration('promptcode.enableTelemetry')) {
+                    this.updateExtensionTelemetrySetting();
+                }
+            })
+        );
     }
 
     private updateExtensionTelemetrySetting(): void {
-        // Only check our own extension setting - VS Code's setting is handled by the reporter
+        // Get the previous value to detect changes
+        const previousValue = this.isEnabled;
+        
+        // Always check the current configuration value
         this.isEnabled = vscode.workspace.getConfiguration('promptcode').get<boolean>('enableTelemetry', true);
+        
+        if (previousValue !== this.isEnabled) {
+            console.log(`PromptCode telemetry setting changed: ${this.isEnabled ? 'enabled' : 'disabled'}`);
+        }
     }
 
     public static getInstance(context?: vscode.ExtensionContext): TelemetryService {
@@ -68,7 +80,10 @@ export class TelemetryService {
         properties?: { [key: string]: string }, 
         measurements?: { [key: string]: number }
     ): void {
-        if (this.isEnabled && this.reporter) {
+        // Check the current setting value before sending
+        const currentSettingEnabled = vscode.workspace.getConfiguration('promptcode').get<boolean>('enableTelemetry', true);
+        
+        if (currentSettingEnabled && this.isEnabled && this.reporter) {
             // Add standard properties
             const allProperties = {
                 ...properties,
@@ -91,7 +106,10 @@ export class TelemetryService {
         properties?: { [key: string]: string }, 
         measurements?: { [key: string]: number }
     ): void {
-        if (this.isEnabled && this.reporter) {
+        // Check the current setting value before sending
+        const currentSettingEnabled = vscode.workspace.getConfiguration('promptcode').get<boolean>('enableTelemetry', true);
+        
+        if (currentSettingEnabled && this.isEnabled && this.reporter) {
             if (typeof error === 'string') {
                 // Handle case where error is just a string
                 this.reporter.sendTelemetryErrorEvent(error, {
@@ -117,6 +135,7 @@ export class TelemetryService {
      * Note: This doesn't check VS Code's global setting, which is handled by the reporter
      */
     public isTelemetryEnabled(): boolean {
-        return this.isEnabled;
+        // Always get the fresh value from settings
+        return vscode.workspace.getConfiguration('promptcode').get<boolean>('enableTelemetry', true) && this.isEnabled;
     }
 } 
