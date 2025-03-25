@@ -5,6 +5,10 @@
   "description": "Generate prompt for LLM from your code",
   "version": "0.2.21",
   "license": "SEE LICENSE IN LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cogflows/promptcode-vscode.git"
+  },
   "private": true,
   "icon": "images/icon.png",
   "engines": {
