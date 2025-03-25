@@ -176,7 +176,7 @@ export async function loadConfiguredPrompts(
     
     // Process each prompt folder from the configuration
     for (const folderPath of promptFolderPaths) {
-        if (!folderPath.trim()) continue;
+        if (!folderPath.trim()) { continue; }
         
         try {
             // Handle both file paths and directory paths
