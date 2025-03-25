@@ -213,45 +213,17 @@
       
       // Add event listener to the Apply All button
       const applyAllButton = header.querySelector('.apply-all-btn');
-      applyAllButton.addEventListener('click', () => {
-        // Get all file items
-        const fileItems = fileChangesContainer.querySelectorAll('.file-change-item');
-        
-        // Apply each file change
-        fileItems.forEach(fileItem => {
-          const filePath = fileItem.dataset.filePath;
-          const fileOperation = fileItem.dataset.fileOperation;
-          const fileCode = fileItem.dataset.fileCode;
-          const replaceButton = fileItem.querySelector('.replace-code-btn');
-          
-          // Skip already applied changes
-          if (replaceButton && !replaceButton.disabled) {
-            vscode.postMessage({
-              command: 'replaceCode',
-              filePath: filePath,
-              fileOperation: fileOperation,
-              fileCode: fileCode
-            });
-            
-            // Update button states
-            replaceButton.textContent = 'Applied';
-            replaceButton.disabled = true;
-            replaceButton.classList.remove('error');
-            replaceButton.classList.add('success');
-            
-            // Disable the show-diff button
-            const showDiffButton = fileItem.querySelector('.show-diff-btn');
-            if (showDiffButton) {
-              showDiffButton.disabled = true;
-              showDiffButton.classList.add('disabled');
+      if (applyAllButton) {
+        applyAllButton.addEventListener('click', () => {
+          const fileItems = fileChangesContainer.querySelectorAll('.file-change-item');
+          fileItems.forEach(item => {
+            const replaceButton = item.querySelector('.replace-code-btn');
+            if (replaceButton) {
+              replaceButton.click();
             }
-          }
+          });
         });
-        
-        // Disable Apply All button
-        applyAllButton.textContent = 'All Applied';
-        applyAllButton.disabled = true;
-      });
+      }
       
       // Process each file element
       Array.from(fileElements).forEach((fileEl, index) => {
@@ -259,6 +231,9 @@
         const fileSummary = getElementTextContent(fileEl, 'file_summary');
         const fileOperation = getElementTextContent(fileEl, 'file_operation');
         const filePath = getElementTextContent(fileEl, 'file_path');
+        const fullFilePath = getElementTextContent(fileEl, 'full_file_path');
+        const workspaceName = getElementTextContent(fileEl, 'workspace_name');
+        const workspaceRoot = getElementTextContent(fileEl, 'workspace_root');
         const fileCode = getElementCData(fileEl, 'file_code');
         
         console.log(`Processing file ${index}: ${filePath} (${fileOperation})`);
@@ -269,6 +244,8 @@
         fileItem.dataset.index = index;
         fileItem.dataset.filePath = filePath;
         fileItem.dataset.fileOperation = fileOperation;
+        fileItem.dataset.workspaceName = workspaceName;
+        fileItem.dataset.workspaceRoot = workspaceRoot;
         
         // Get operation label and button text based on operation type
         const operationLabel = fileOperation.toUpperCase();
@@ -276,24 +253,10 @@
         // Always show diff button for all operations
         let shouldShowDiffButton = true;
         
-        // Extract relative path from the full path
-        // Look for the last occurrence of common project directories
+        // Create display path with workspace information
         let displayPath = filePath;
-        const pathSegments = filePath.split('/');
-        // Find the project folder index
-        let projectFolderIndex = -1;
-        for (let i = 0; i < pathSegments.length; i++) {
-          const segment = pathSegments[i];
-          // Check for common folder names that might be the project root
-          if (['promptcode', 'src', 'webview', 'components', 'public', 'app'].includes(segment)) {
-            projectFolderIndex = i;
-            break;
-          }
-        }
-
-        // If we found a project folder, create a relative path
-        if (projectFolderIndex >= 0) {
-          displayPath = pathSegments.slice(projectFolderIndex).join('/');
+        if (workspaceName) {
+          displayPath = `${workspaceName}: ${filePath}`;
         }
         
         // Updated HTML structure with operation label and conditional buttons
@@ -319,56 +282,31 @@
         const replaceButton = fileItem.querySelector('.replace-code-btn');
         const showDiffButton = fileItem.querySelector('.show-diff-btn');
         
-        // Set initial styles for the buttons
+        // Add click handlers for the buttons
         if (replaceButton) {
-          // Add click event listener for replace button
-          replaceButton.addEventListener('click', (e) => {
-            const button = e.target;
-            const filePath = button.dataset.filePath;
-            const fileOperation = button.dataset.fileOperation;
-            const fileCode = fileItem.dataset.fileCode;
-            
+          replaceButton.addEventListener('click', () => {
+            // Send message to extension to replace code
             vscode.postMessage({
               command: 'replaceCode',
               filePath: filePath,
               fileOperation: fileOperation,
-              fileCode: fileCode
+              fileCode: fileCode,
+              workspaceName: workspaceName,
+              workspaceRoot: workspaceRoot
             });
-            
-            // Change the button text to "Applied" and disable both buttons
-            button.textContent = 'Applied';
-            button.disabled = true;
-            button.classList.add('success');
-            
-            // Disable the show-diff button
-            const showDiffButton = fileItem.querySelector('.show-diff-btn');
-            if (showDiffButton) {
-              showDiffButton.disabled = true;
-              showDiffButton.classList.add('disabled');
-            }
           });
         }
-
+        
         if (showDiffButton) {
-          // Add click event listener for show-diff button
           showDiffButton.addEventListener('click', () => {
-            // For DELETE operations, fileCode might be empty, but that's OK
-            // since we just need to show the original file that will be deleted
-            if (fileOperation.toUpperCase() === 'DELETE') {
-              vscode.postMessage({
-                command: 'showDiff',
-                filePath: filePath,
-                fileOperation: fileOperation,
-                fileCode: fileCode || '' // Provide empty string as fallback
-              });
-            } else {
-              vscode.postMessage({
-                command: 'showDiff',
-                filePath: filePath,
-                fileCode: fileCode,
-                fileOperation: fileOperation
-              });
-            }
+            // Show diff in a new tab
+            vscode.postMessage({
+              command: 'showDiff',
+              filePath: filePath,
+              fileCode: fileCode,
+              workspaceName: workspaceName,
+              workspaceRoot: workspaceRoot
+            });
           });
         }
       });

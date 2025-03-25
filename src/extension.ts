@@ -291,46 +291,48 @@ export function activate(context: vscode.ExtensionContext) {
 	// Register replace code command
 	const replaceCodeCommand = vscode.commands.registerCommand('promptcode.replaceCode', async (message) => {
 		try {
-			const { filePath, fileOperation, fileCode } = message;
-			if (!filePath) {
-				throw new Error('No file path provided');
+			const { filePath, fileOperation, fileCode, workspaceName, workspaceRoot } = message;
+			
+			// Find the workspace folder for this file
+			let targetWorkspaceFolder: vscode.WorkspaceFolder | undefined;
+			
+			if (workspaceName && workspaceRoot) {
+				// Try to find the workspace folder by name and root path
+				targetWorkspaceFolder = vscode.workspace.workspaceFolders?.find(folder => 
+					folder.name === workspaceName && folder.uri.fsPath === workspaceRoot
+				);
 			}
 			
-			// Use filePath directly as file URI since we know it's absolute
-			const fileUri = vscode.Uri.file(filePath);
+			if (!targetWorkspaceFolder) {
+				// Fallback to finding the workspace folder by file path
+				const uri = vscode.Uri.file(path.join(workspaceRoot || '', filePath));
+				targetWorkspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
+			}
+			
+			if (!targetWorkspaceFolder) {
+				throw new Error(`Could not find workspace folder for file: ${filePath}`);
+			}
+			
+			// Construct the full file path
+			const fullPath = path.join(targetWorkspaceFolder.uri.fsPath, filePath);
 			
 			// Handle different file operations
 			switch (fileOperation.toUpperCase()) {
 				case 'CREATE':
-					// Ensure the directory exists
-					const dirPath = path.dirname(fileUri.fsPath);
-					await vscode.workspace.fs.createDirectory(vscode.Uri.file(dirPath));
-					
-					// Create the file with the provided content
-					await vscode.workspace.fs.writeFile(fileUri, Buffer.from(fileCode, 'utf8'));
+					// Create the directory if it doesn't exist
+					await fs.promises.mkdir(path.dirname(fullPath), { recursive: true });
+					// Create the file with the new content
+					await fs.promises.writeFile(fullPath, fileCode);
 					break;
 					
 				case 'UPDATE':
-					// Check if the file exists first
-					try {
-						await vscode.workspace.fs.stat(fileUri);
-					} catch (err) {
-						vscode.window.showWarningMessage(`File ${filePath} not found. Creating it as a new file.`);
-					}
-					
-					// Update the existing file with the new content
-					await vscode.workspace.fs.writeFile(fileUri, Buffer.from(fileCode, 'utf8'));
+					// Update the file with the new content
+					await fs.promises.writeFile(fullPath, fileCode);
 					break;
 					
 				case 'DELETE':
-					// Check if the file exists first
-					try {
-						await vscode.workspace.fs.stat(fileUri);
-						// Delete the file if it exists
-						await vscode.workspace.fs.delete(fileUri);
-					} catch (err) {
-						throw new Error(`Cannot delete file: ${filePath} not found.`);
-					}
+					// Delete the file
+					await fs.promises.unlink(fullPath);
 					break;
 					
 				default:
@@ -339,8 +341,8 @@ export function activate(context: vscode.ExtensionContext) {
 			
 			// Notify the webview that the code was replaced successfully
 			if (promptCodeProvider._panel) {
-				// Use basename for display in success message
-				const displayPath = path.basename(filePath);
+				// Use workspace name and file path for display
+				const displayPath = workspaceName ? `${workspaceName}: ${filePath}` : filePath;
 				
 				promptCodeProvider._panel.webview.postMessage({
 					command: 'codeReplaced',
@@ -352,7 +354,7 @@ export function activate(context: vscode.ExtensionContext) {
 				// Show a user-friendly message
 				const operationMsg = fileOperation.toUpperCase() === 'CREATE' ? 'created' :
 					fileOperation.toUpperCase() === 'DELETE' ? 'deleted' : 'updated';
-				vscode.window.showInformationMessage(`Successfully ${operationMsg} ${filePath}`);
+				vscode.window.showInformationMessage(`Successfully ${operationMsg} ${displayPath}`);
 			}
 		} catch (error) {
 			const errorMessage = `Failed to apply code changes: ${error instanceof Error ? error.message : String(error)}`;

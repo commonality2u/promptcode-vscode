@@ -1,6 +1,6 @@
 ---
 description: Generate complete implementation with full outputs
-category: Documentation
+category: Output
 ---
 You are an expert software engineer.
 
@@ -24,6 +24,7 @@ Here are some notes on how you should respond in the XML section:
 - If it is a CREATE or UPDATE include the full file code. Do not get lazy.
 - Each file should include a brief change summary.
 - Include the full file path
+- Include workspace information (name and root path) for each file
 - I am going to copy/paste that entire XML section into a parser to automatically apply the changes you made, so put the XML block inside a markdown codeblock.
 - Make sure to enclose the code with ![CDATA[__CODE HERE__]]
 - Don't add comments in the code explaining what you did. Only use comments normally like a developer would if especially complex.
@@ -35,7 +36,10 @@ Here is how you should structure the XML:
     <file>
       <file_summary>__BRIEF CHANGE SUMMARY HERE__</file_summary>
       <file_operation>__FILE OPERATION HERE__</file_operation>
-      <file_path>__FILE PATH HERE__</file_path>
+      <file_path>__FILE PATH FROM WORKSPACE ROOT___</file_path>
+      <full_file_path>__FULL FILE PATH HERE__</full_file_path>
+      <workspace_name>__WORKSPACE NAME HERE__</workspace_name>
+      <workspace_root>__WORKSPACE ROOT PATH HERE__</workspace_root>
       <file_code><![CDATA[
 __FULL FILE CODE HERE__
 ]]></file_code>
