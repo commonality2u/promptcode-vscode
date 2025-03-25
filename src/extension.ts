@@ -13,11 +13,16 @@ import * as fs from 'fs';
 import { IgnoreHelper } from './ignoreHelper';
 import * as os from 'os';
 import { DEFAULT_IGNORE_PATTERNS } from './constants';
+import { TelemetryService } from './telemetry';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 	console.log('PromptCode extension activated');
+
+	// Initialize telemetry service
+	const telemetryService = TelemetryService.getInstance(context);
+	telemetryService.sendTelemetryEvent('extension_activated');
 
 	// Initialize token counter with global storage path
 	if (context.globalStorageUri) {
@@ -110,11 +115,13 @@ export function activate(context: vscode.ExtensionContext) {
 	// Register select all command
 	const selectAllCommand = vscode.commands.registerCommand('promptcode.selectAll', () => {
 		fileExplorerProvider.selectAll();
+		TelemetryService.getInstance().sendTelemetryEvent('select_all_files');
 	});
 
 	// Register deselect all command
 	const deselectAllCommand = vscode.commands.registerCommand('promptcode.deselectAll', () => {
 		fileExplorerProvider.deselectAll();
+		TelemetryService.getInstance().sendTelemetryEvent('deselect_all_files');
 	});
 
 	// Register expand all command
@@ -156,6 +163,7 @@ export function activate(context: vscode.ExtensionContext) {
 			progress.report({ increment: 0 });
 			
 			try {
+				const startTime = Date.now();
 				const selectedFiles = await getSelectedFilesWithContent();
 				const instructions = context.workspaceState.get('promptcode.instructions', '');
 				// Get includeOptions from workspace state - throw if not found
@@ -167,6 +175,7 @@ export function activate(context: vscode.ExtensionContext) {
 				}
 				
 				const promptText = await generatePrompt(selectedFiles, instructions, savedOptions);
+				const executionTime = Date.now() - startTime;
 				
 				// Create a new document to show the prompt
 				const document = await vscode.workspace.openTextDocument({
@@ -190,8 +199,20 @@ export function activate(context: vscode.ExtensionContext) {
 					}
 				});
 				
+				// Send telemetry
+				TelemetryService.getInstance().sendTelemetryEvent('prompt_generated', {
+					includeFiles: String(savedOptions.files),
+					includeInstructions: String(savedOptions.instructions)
+				}, {
+					fileCount: selectedFiles.length,
+					tokenCount: countTokens(promptText),
+					executionTimeMs: executionTime
+				});
+				
 				progress.report({ increment: 100 });
 			} catch (error) {
+				// Send error telemetry
+				TelemetryService.getInstance().sendTelemetryException(error instanceof Error ? error : new Error(String(error)));
 				vscode.window.showErrorMessage(`Error generating prompt: ${(error as Error).message || String(error)}`);
 			}
 			
@@ -239,6 +260,7 @@ export function activate(context: vscode.ExtensionContext) {
 			const text = document.getText();
 			await copyToClipboard(text);
 			vscode.window.showInformationMessage('Content copied to clipboard');
+			TelemetryService.getInstance().sendTelemetryEvent('copy_to_clipboard');
 		} else {
 			vscode.window.showWarningMessage('No active text editor to copy from');
 		}
@@ -255,6 +277,7 @@ export function activate(context: vscode.ExtensionContext) {
 			progress.report({ increment: 0 });
 			
 			try {
+				const startTime = Date.now();
 				const selectedFiles = await getSelectedFilesWithContent();
 				const instructions = context.workspaceState.get('promptcode.instructions', '');
 				// Get includeOptions from workspace state - throw if not found
@@ -266,6 +289,7 @@ export function activate(context: vscode.ExtensionContext) {
 				}
 				
 				const promptText = await generatePrompt(selectedFiles, instructions, savedOptions);
+				const executionTime = Date.now() - startTime;
 				
 				// Copy to clipboard directly
 				await copyToClipboard(promptText);
@@ -273,8 +297,20 @@ export function activate(context: vscode.ExtensionContext) {
 				// Show success message
 				vscode.window.showInformationMessage('Prompt copied to clipboard successfully!');
 				
+				// Send telemetry
+				TelemetryService.getInstance().sendTelemetryEvent('prompt_copied', {
+					includeFiles: String(savedOptions.files),
+					includeInstructions: String(savedOptions.instructions)
+				}, {
+					fileCount: selectedFiles.length,
+					tokenCount: countTokens(promptText),
+					executionTimeMs: executionTime
+				});
+				
 				progress.report({ increment: 100 });
 			} catch (error) {
+				// Send error telemetry
+				TelemetryService.getInstance().sendTelemetryException(error instanceof Error ? error : new Error(String(error)));
 				vscode.window.showErrorMessage(`Error generating prompt: ${(error as Error).message || String(error)}`);
 			}
 			
@@ -1034,7 +1070,11 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 // This method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() {
+	// Send final telemetry event before deactivation
+	const telemetryService = TelemetryService.getInstance();
+	telemetryService.sendTelemetryEvent('extension_deactivated');
+}
 
 // Helper function to validate includeOptions
 function isValidIncludeOptions(options: any): options is { files: boolean; instructions: boolean } {

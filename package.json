@@ -3,7 +3,7 @@
   "name": "promptcode",
   "displayName": "promptcode",
   "description": "Generate prompt for LLM from your code",
-  "version": "0.2.23",
+  "version": "0.2.24",
   "license": "SEE LICENSE IN LICENSE",
   "repository": {
     "type": "git",
@@ -91,6 +91,11 @@
           "type": "string",
           "default": "",
           "description": "Custom patterns to ignore when scanning files (one per line)"
+        },
+        "promptcode.enableTelemetry": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable sending anonymous usage data to help improve the extension (respects VS Code's telemetry settings)"
         }
       }
     },
@@ -154,14 +159,15 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "node ./scripts/build.js --minify --publish",
+    "vscode:prepublish": "node ./scripts/build.js --minify --publish && node ./scripts/inject-telemetry.js",
     "compile": "node ./scripts/build.js",
     "watch": "node ./scripts/watch.js",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
     "test": "vscode-test",
-    "build:prod": "node ./scripts/build.js --minify --publish",
-    "build:dev": "node ./scripts/build.js"
+    "build:prod": "node ./scripts/build.js --minify --publish && node ./scripts/inject-telemetry.js",
+    "build:dev": "node ./scripts/build.js",
+    "build:with-telemetry": "node ./scripts/build-with-telemetry.js"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
@@ -169,15 +175,16 @@
     "@types/vscode": "^1.96.0",
     "@typescript-eslint/eslint-plugin": "^8.25.0",
     "@typescript-eslint/parser": "^8.25.0",
+    "@vscode/codicons": "^0.0.36",
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.4.1",
     "esbuild": "^0.25.1",
     "eslint": "^9.21.0",
-    "typescript": "^5.7.3",
-    "@vscode/codicons": "^0.0.36",
+    "gpt-tokenizer": "^2.1.2",
     "ignore": "^7.0.3",
-    "gpt-tokenizer": "^2.1.2"
+    "typescript": "^5.7.3"
   },
   "dependencies": {
+    "@vscode/extension-telemetry": "^0.9.8"
   }
 }

@@ -33,3 +33,6 @@ coverage/
 .vscode-test/
 *.vsix
 .cursor/
+
+# Telemetry configuration
+scripts/.telemetry-config.json

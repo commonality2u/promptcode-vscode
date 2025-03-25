@@ -6,6 +6,12 @@
 
 PromptCode is your go-to VS Code extension when code agents like Cursor or Windsurf hit a wall. Designed to supercharge your coding workflow, PromptCode seamlessly connects your codebase to your favorite AI models—including those without direct API access, like o1-pro or Grok. Pick your file context, craft precise prompt templates, generate AI prompts, and even parse the responses—all within the comfort of your VS Code editor.
 
+## Demo Video
+
+Watch this short demo to see PromptCode in action:
+
+[![PromptCode Video](https://img.youtube.com/vi/dUpdSAPklfo/0.jpg)](https://www.youtube.com/watch?v=dUpdSAPklfo)
+
 ## Why PromptCode?
 
 When your trusty code agent stumbles, PromptCode steps in as the ultimate rescue tool. Its unique strength lies in bridging the gap between your codebase and AI models, offering a structured, intuitive way to:
@@ -58,6 +64,10 @@ Tailor PromptCode to your needs with these options:
 ## Installation
 
 You can install this extension from the Visual Studio Code marketplace.
+
+## Telemetry
+
+PromptCode collects anonymous usage data (which features are used and any errors encountered) to improve the extension. This respects VS Code's telemetry settings and can be disabled via `promptcode.enableTelemetry` setting. No personal data, file contents, prompts, or code are ever collected.
 
 ## Copyright 
 
