@@ -9,7 +9,6 @@
     "type": "git",
     "url": "https://github.com/cogflows/promptcode-vscode.git"
   },
-  "private": true,
   "icon": "images/icon.png",
   "engines": {
     "vscode": "^1.96.0"
@@ -17,7 +16,6 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
   "main": "./out/extension.js",
   "files": [
     "out/**/*",

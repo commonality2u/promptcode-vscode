@@ -36,6 +36,15 @@ esbuild.build({
   const webviewDir = join(__dirname, '..', 'src', 'webview');
   const webviewStylesDir = join(webviewDir, 'styles');
   const outWebviewStylesDir = join(__dirname, '..', 'out', 'webview', 'styles');
+  const outWebviewDir = join(__dirname, '..', 'out', 'webview');
+  
+  // Create output directories if they don't exist
+  if (!existsSync(outWebviewStylesDir)) {
+    mkdirSync(outWebviewStylesDir, { recursive: true });
+  }
+  if (!existsSync(outWebviewDir)) {
+    mkdirSync(outWebviewDir, { recursive: true });
+  }
   
   // Copy all CSS files
   readdirSync(webviewStylesDir)
@@ -74,74 +83,43 @@ esbuild.build({
     },
   }).then(() => {
     console.log('Webview JS files compiled and minified successfully');
+    
+    // Copy codicons files to output directory
+    const codiconsDir = path.join(__dirname, '../node_modules/@vscode/codicons/dist');
+    const codiconsOutDir = path.join(__dirname, '../out/webview/codicons');
+    
+    // Create directory if it doesn't exist
+    if (!existsSync(codiconsOutDir)) {
+      mkdirSync(codiconsOutDir, { recursive: true });
+    }
+    
+    // Copy codicon.ttf
+    copyFileSync(
+      path.join(codiconsDir, 'codicon.ttf'),
+      path.join(codiconsOutDir, 'codicon.ttf')
+    );
+    
+    // Read the original CSS file
+    const codiconCssContent = fs.readFileSync(path.join(codiconsDir, 'codicon.css'), 'utf8');
+    
+    // Update the font path to point to the same directory
+    const updatedCssContent = codiconCssContent.replace(/url\(['"]?[^'"]*codicon\.ttf['"]?\)/g, "url('codicon.ttf')");
+    
+    // Write the modified CSS file
+    fs.writeFileSync(path.join(codiconsOutDir, 'codicon.css'), updatedCssContent);
+    
+    console.log('Copied and modified codicons files to output directory');
+    
+    // Add copyright notices to output files
+    console.log('Adding copyright notices to output files...');
+    
+    // Build completed successfully
+    process.exit(0);
   }).catch(error => {
     console.error('Error processing webview JS files:', error);
     process.exit(1);
   });
-  
-  // Copy codicons files to output directory
-  const codiconsDir = path.join(__dirname, '../node_modules/@vscode/codicons/dist');
-  const codiconsOutDir = path.join(__dirname, '../out/webview/codicons');
-  
-  // Create directory if it doesn't exist
-  if (!existsSync(codiconsOutDir)) {
-    mkdirSync(codiconsOutDir, { recursive: true });
-  }
-  
-  // Copy codicon.ttf
-  copyFileSync(
-    path.join(codiconsDir, 'codicon.ttf'),
-    path.join(codiconsOutDir, 'codicon.ttf')
-  );
-  
-  // Read the original CSS file
-  const codiconCssContent = fs.readFileSync(path.join(codiconsDir, 'codicon.css'), 'utf8');
-  
-  // Update the font path to point to the same directory
-  const updatedCssContent = codiconCssContent.replace(
-    'src: url("./codicon.ttf?',
-    'src: url("codicon.ttf?'
-  );
-  
-  // Write the modified CSS file
-  fs.writeFileSync(path.join(codiconsOutDir, 'codicon.css'), updatedCssContent);
-  
-  console.log('Copied and modified codicons files to output directory');
-  
-  // Add copyright notice to all output JavaScript files
-  if (isPublishBuild) {
-    console.log('Adding copyright notices to output files...');
-    const copyrightNotice = '/* PromptCode - Copyright (C) 2025. All Rights Reserved. */\n';
-    
-    // Function to add copyright to a file
-    const addCopyrightToFile = (filePath) => {
-      const content = fs.readFileSync(filePath, 'utf8');
-      if (!content.includes('Copyright (C)')) {
-        fs.writeFileSync(filePath, copyrightNotice + content);
-        console.log(`Added copyright notice to ${filePath}`);
-      }
-    };
-
-    // Add copyright to all JS files in output directory
-    const processDir = (dir) => {
-      readdirSync(dir, { withFileTypes: true }).forEach(dirent => {
-        const fullPath = path.join(dir, dirent.name);
-        if (dirent.isDirectory()) {
-          processDir(fullPath);
-        } else if (dirent.name.endsWith('.js')) {
-          addCopyrightToFile(fullPath);
-        }
-      });
-    };
-
-    processDir(outDir);
-  }
-  
-  console.log('Build completed successfully!');
-  
-  // Remove sourcemap files for publish builds
-  if (isPublishBuild) {
-    console.log('Removing sourcemap files for production build...');
-    removeSourcemapFiles(outDir);
-  }
-}).catch(() => process.exit(1)); 
+}).catch(error => {
+  console.error('Error compiling extension:', error);
+  process.exit(1);
+}); 
