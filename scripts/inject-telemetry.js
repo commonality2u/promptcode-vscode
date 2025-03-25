@@ -7,10 +7,26 @@ const path = require('path');
  */
 function injectTelemetryString() {
   // Get connection string from environment variable
-  const connectionString = process.env.PROMPTCODE_TELEMETRY_CONNECTION_STRING;
+  let connectionString = process.env.PROMPTCODE_TELEMETRY_CONNECTION_STRING;
+  
+  // If not in environment, try to get from config file
+  if (!connectionString) {
+    const configPath = path.join(__dirname, '.telemetry-config.json');
+    if (fs.existsSync(configPath)) {
+      try {
+        const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+        if (config.connectionString) {
+          connectionString = config.connectionString;
+          console.log('Using connection string from .telemetry-config.json');
+        }
+      } catch (error) {
+        console.error('Error reading telemetry config file:', error);
+      }
+    }
+  }
   
   if (!connectionString) {
-    console.warn('Warning: PROMPTCODE_TELEMETRY_CONNECTION_STRING environment variable not set. Telemetry will be disabled.');
+    console.warn('Warning: PROMPTCODE_TELEMETRY_CONNECTION_STRING environment variable not set and no valid .telemetry-config.json found. Telemetry will be disabled.');
     return;
   }
 

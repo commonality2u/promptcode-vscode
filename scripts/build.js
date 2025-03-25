@@ -11,9 +11,9 @@ const isPublishBuild = process.argv.includes('--publish') || process.env.NODE_EN
 
 // Build the extension
 esbuild.build({
-  entryPoints: ['src/extension.ts'],
+  entryPoints: ['src/extension.ts', 'src/telemetry.ts'],
   bundle: true,
-  outfile: 'out/extension.js',
+  outdir: 'out',
   external: ['vscode'],
   platform: 'node',
   format: 'cjs',
