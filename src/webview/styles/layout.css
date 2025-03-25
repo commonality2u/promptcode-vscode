@@ -1,0 +1,119 @@
+/**
+ * Layout - Global layout styles for the application
+ */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--vscode-font-family, system-ui, -apple-system, 'Segoe UI', Roboto);
+  color: var(--vscode-foreground);
+  background-color: var(--vscode-editor-background);
+  line-height: 1.6;
+  padding: var(--spacing-md);
+  max-width: 1000px;
+  margin: 0 auto;
+  min-height: 100vh;
+}
+
+/* Main app container - Wraps the entire webview content */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  min-height: 100vh;
+}
+
+/* Header section - Contains title, logo, and subtitle */
+.header {
+  text-align: center;
+  padding: var(--spacing-lg) var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.header-title {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: var(--accent-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.5px;
+  margin: 0;
+}
+
+.logo-icon {
+  width: 32px;
+  height: 32px;
+  color: white;
+  font-size: 28px;
+  margin-right: 8px;
+}
+
+/* Company branding in header */
+.company {
+  font-size: 15px;
+  font-weight: 500;
+  opacity: 0.9;
+  color: white;
+}
+
+.company-link {
+  color: white;
+  text-decoration: none;
+  position: relative;
+  transition: opacity var(--transition-speed) ease;
+}
+
+.company-link:hover {
+  opacity: 0.8;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--vscode-descriptionForeground);
+  margin-top: var(--spacing-xs);
+}
+
+/* Footer - Contains version info and links */
+.footer {
+  text-align: center;
+  padding: var(--spacing-lg) 0;
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground);
+  margin-top: auto;
+}
+
+.footer a {
+  color: var(--accent-color);
+  text-decoration: none;
+  transition: opacity var(--transition-speed) ease;
+}
+
+.footer a:hover {
+  opacity: 0.8;
+}
+
+/* Media queries for responsive layout */
+@media (max-width: 1200px) {
+  .directory-files {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .directory-files {
+    grid-template-columns: 1fr;
+  }
+} 

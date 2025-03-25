@@ -1,0 +1,28 @@
+/**
+ * CSS Variables - Global design tokens used throughout the application
+ */
+
+:root {
+  /* Spacing variables - Control consistent margins and padding */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  
+  /* Border radius - For consistent rounding of corners */
+  --border-radius-sm: 6px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  
+  /* Transitions - For consistent animation timing */
+  --transition-speed: 0.2s;
+  
+  /* Shadows - For consistent elevation effects */
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  
+  /* Colors - Primary accent colors */
+  --accent-color: #3b82f6;
+  --accent-hover: #2563eb;
+} 

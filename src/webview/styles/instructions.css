@@ -1,0 +1,187 @@
+/**
+ * Instructions Tab - Styles specific to the Instructions tab
+ */
+
+/* Instructions header section */
+.instruction-header {
+  padding: var(--spacing-md);
+  padding-bottom: 0;
+}
+
+/* Instruction title */
+.instruction-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--vscode-foreground);
+  margin-bottom: var(--spacing-xs);
+}
+
+/* Instruction subtitle - descriptive text */
+.instruction-subtitle {
+  font-size: 13px;
+  color: var(--vscode-descriptionForeground);
+  margin-bottom: var(--spacing-md);
+  line-height: 1.5;
+}
+
+/* Special spacing for instructions tab */
+#instructions-tab {
+  margin-top: var(--spacing-lg);
+}
+
+/* Fix for collapsed configuration section - Add bottom border */
+#prompts-config-section.collapsed {
+  border-bottom: 1px solid var(--vscode-panel-border);
+}
+
+#prompts-config-section.collapsed .section-header {
+  border-bottom: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
+/* Specific override for instruction textarea in this tab only */
+#instructions-tab .instruction-textarea {
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+}
+
+/* Prompt folders container */
+.prompt-folders-container {
+  margin-top: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.prompt-folders-container label {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+  color: var(--vscode-descriptionForeground);
+  font-size: 13px;
+}
+
+#prompt-folders {
+  width: 100%;
+  min-height: 200px;
+  background: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-sm);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+/* Prompt picker dropdown - List of available prompt templates */
+.prompt-picker {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 300px;
+  background: var(--vscode-dropdown-background);
+  border: 1px solid var(--vscode-dropdown-border);
+  border-radius: var(--border-radius-md);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
+  box-shadow: var(--shadow-md);
+  display: none;
+}
+
+/* Prompt list container */
+.prompt-list {
+  list-style: none;
+}
+
+/* Individual prompt item in the dropdown */
+.prompt-item {
+  display: flex;
+  padding: var(--spacing-sm) var(--spacing-md);
+  cursor: pointer;
+}
+
+.prompt-item:hover {
+  background: var(--vscode-list-hoverBackground);
+}
+
+.prompt-item.selected {
+  background: var(--vscode-list-activeSelectionBackground);
+}
+
+/* Category folder styles */
+.prompt-category {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  cursor: pointer;
+  font-weight: 500;
+  border-bottom: 1px solid var(--vscode-dropdown-border);
+}
+
+.prompt-category:hover {
+  background: var(--vscode-list-hoverBackground);
+}
+
+.prompt-category-icon {
+  margin-right: var(--spacing-sm);
+  font-size: 14px;
+}
+
+.prompt-category-items {
+  display: none;
+  padding-left: var(--spacing-md);
+}
+
+.prompt-category.open .prompt-category-items {
+  display: block;
+}
+
+.prompt-category.open .prompt-category-icon::before {
+  content: "▼";
+  font-size: 10px;
+}
+
+.prompt-category .prompt-category-icon::before {
+  content: "►";
+  font-size: 10px;
+}
+
+/* Prompt name in dropdown item */
+.prompt-name {
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+/* Prompt description in dropdown item */
+.prompt-description {
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground);
+}
+
+/* Template tag - Inline chip for embedded templates */
+.template-tag {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--accent-color);
+  color: white;
+  font-size: 13px;
+  padding: 2px 8px;
+  border-radius: var(--border-radius-sm);
+  margin: 0 2px;
+  white-space: nowrap;
+  cursor: pointer;
+  font-weight: 500;
+  box-shadow: var(--shadow-sm);
+  user-select: none;
+}
+
+.template-tag:hover {
+  background-color: var(--accent-hover);
+  box-shadow: var(--shadow-md);
+}
+
+.template-tag:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+} 

@@ -1,0 +1,181 @@
+{
+  "publisher": "cogflows",
+  "name": "promptcode",
+  "displayName": "promptcode",
+  "description": "Generate prompt for LLM from your code",
+  "version": "0.2.21",
+  "license": "SEE LICENSE IN LICENSE",
+  "private": true,
+  "icon": "images/icon.png",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "files": [
+    "out/**/*",
+    "prompts/**/*",
+    "images/**/*",
+    "LICENSE",
+    "README.md",
+    "CONTRIBUTING.md",
+    "CODE_OF_CONDUCT.md",
+    "SECURITY.md"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "promptcode.showFileSelector",
+        "title": "PromptCode: Show Files"
+      },
+      {
+        "command": "promptcode.generatePrompt",
+        "title": "PromptCode: Generate",
+        "icon": "$(play)"
+      },
+      {
+        "command": "promptcode.selectAll",
+        "title": "PromptCode: Select All Files",
+        "icon": "$(check-all)"
+      },
+      {
+        "command": "promptcode.deselectAll",
+        "title": "PromptCode: Clear Selection",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "promptcode.copyToClipboard",
+        "title": "PromptCode: Copy to Clipboard"
+      },
+      {
+        "command": "promptcode.showPromptCodeView",
+        "title": "PromptCode: Show Interface"
+      },
+      {
+        "command": "promptcode.clearTokenCache",
+        "title": "PromptCode: Clear Cache",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "promptcode.refreshFileExplorer",
+        "title": "PromptCode: Refresh File Explorer",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "promptcode.copyFilePath",
+        "title": "Copy Path"
+      },
+      {
+        "command": "promptcode.copyRelativeFilePath",
+        "title": "Copy Relative Path"
+      },
+      {
+        "command": "promptcode.openFileInEditor",
+        "title": "Open in Editor"
+      }
+    ],
+    "configuration": {
+      "title": "PromptCode",
+      "properties": {
+        "promptcode.respectGitignore": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to respect .gitignore rules when scanning files"
+        },
+        "promptcode.ignorePatterns": {
+          "type": "string",
+          "default": "",
+          "description": "Custom patterns to ignore when scanning files (one per line)"
+        }
+      }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "promptcode-explorer",
+          "title": "PromptCode",
+          "icon": "$(file-code)"
+        }
+      ]
+    },
+    "views": {
+      "promptcode-explorer": [
+        {
+          "id": "promptcodeExplorer",
+          "name": "Files"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "promptcode.selectAll",
+          "when": "view == promptcodeExplorer",
+          "group": "navigation@1"
+        },
+        {
+          "command": "promptcode.deselectAll",
+          "when": "view == promptcodeExplorer",
+          "group": "navigation@2"
+        },
+        {
+          "command": "promptcode.generatePrompt",
+          "when": "view == promptcodeExplorer",
+          "group": "navigation@3"
+        },
+        {
+          "command": "promptcode.clearTokenCache",
+          "when": "view == promptcodeExplorer",
+          "group": "navigation@4"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "promptcode.openFileInEditor",
+          "when": "view == promptcodeExplorer && viewItem == file",
+          "group": "navigation@1"
+        },
+        {
+          "command": "promptcode.copyFilePath",
+          "when": "view == promptcodeExplorer && (viewItem == file || viewItem == directory)",
+          "group": "1_copy@1"
+        },
+        {
+          "command": "promptcode.copyRelativeFilePath",
+          "when": "view == promptcodeExplorer && (viewItem == file || viewItem == directory)",
+          "group": "1_copy@2"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "node ./scripts/build.js --minify --publish",
+    "compile": "node ./scripts/build.js",
+    "watch": "node ./scripts/watch.js",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test",
+    "build:prod": "node ./scripts/build.js --minify --publish",
+    "build:dev": "node ./scripts/build.js"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.96.0",
+    "@typescript-eslint/eslint-plugin": "^8.25.0",
+    "@typescript-eslint/parser": "^8.25.0",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1",
+    "esbuild": "^0.25.1",
+    "eslint": "^9.21.0",
+    "typescript": "^5.7.3",
+    "@vscode/codicons": "^0.0.36",
+    "ignore": "^7.0.3",
+    "gpt-tokenizer": "^2.1.2"
+  },
+  "dependencies": {
+  }
+}

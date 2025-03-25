@@ -1,0 +1,38 @@
+/**
+ * Cards - Styles for card components used throughout the application
+ */
+
+/* Basic card container */
+.card {
+  background: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+/* Inner content area of cards */
+.card-content {
+  padding: 0 var(--spacing-md) var(--spacing-lg);
+}
+
+/* Special spacing for instructions tab */
+#instructions-tab .card-content {
+  padding-top: 0;
+}
+
+/* Card header with title and actions */
+.card-header {
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--vscode-panel-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Card title styling */
+.card-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--vscode-foreground);
+} 

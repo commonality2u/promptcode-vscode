@@ -1,0 +1,225 @@
+/**
+ * Buttons - Styles for various button components
+ */
+
+/* Base button style */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-speed) ease;
+}
+
+/* Button icon styling */
+.button svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Primary action button */
+.button.primary {
+  background: var(--accent-color);
+  color: white;
+}
+
+/* Button hover state */
+.button:hover {
+  background: var(--vscode-button-hoverBackground);
+}
+
+/* Disabled button state */
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Action button (for file actions) */
+.action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--vscode-descriptionForeground);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--border-radius-sm);
+  transition: all var(--transition-speed) ease;
+}
+
+.action-button:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
+.action-button svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* View mode buttons */
+.view-mode-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background: transparent;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  color: var(--vscode-descriptionForeground);
+  transition: all var(--transition-speed) ease;
+}
+
+.view-mode-button.active {
+  background: var(--vscode-list-activeSelectionBackground);
+  color: var(--vscode-list-activeSelectionForeground);
+  box-shadow: var(--shadow-sm);
+}
+
+.view-mode-button:not(.active):hover {
+  background: var(--vscode-list-hoverBackground);
+}
+
+.view-mode-button.active:hover {
+  opacity: 0.9;
+}
+
+.view-mode-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* File action buttons */
+.file-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: 12px;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--vscode-panel-border);
+  background: var(--vscode-button-secondaryBackground);
+  color: var(--vscode-button-secondaryForeground);
+}
+
+.file-actions button:hover {
+  background: var(--vscode-button-secondaryHoverBackground);
+}
+
+/* Custom styled buttons */
+button.custom-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: 12px;
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  cursor: pointer;
+  transition: all var(--transition-speed) ease;
+}
+
+/* Show diff button */
+button.show-diff-btn.custom-button {
+  background: var(--vscode-button-secondaryBackground);
+  color: var(--vscode-button-secondaryForeground);
+  border: 1px solid var(--vscode-panel-border);
+}
+
+/* Replace code button */
+button.replace-code-btn.custom-button {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+}
+
+/* Success state for replace button */
+button.replace-code-btn.custom-button.success {
+  background: #22c55e;
+  color: white;
+  border: none;
+}
+
+/* Disabled state for diff button */
+button.show-diff-btn.custom-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--vscode-button-secondaryBackground);
+  color: var(--vscode-button-secondaryForeground);
+}
+
+/* Apply all button */
+.apply-all-btn {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-speed) ease;
+}
+
+.apply-all-btn:hover {
+  background: var(--accent-hover);
+}
+
+.apply-all-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Codicon styling for buttons and tabs */
+.codicon {
+  font-size: 16px;
+  vertical-align: middle;
+  margin-right: 5px;
+  color: var(--text-color);
+}
+
+button .codicon {
+  margin-right: 6px;
+}
+
+.tab-trigger .codicon {
+  font-size: 18px;
+}
+
+.view-mode-button .codicon {
+  margin-right: 0;
+}
+
+/* Custom positioning for specific codicons */
+#clear-search.codicon {
+  cursor: pointer;
+  font-size: 14px;
+  margin-right: 0;
+}
+
+.toggle-icon.codicon {
+  margin-right: 0;
+  transition: transform 0.2s;
+}
+
+.configuration-section:not(.collapsed) .toggle-icon.codicon {
+  transform: rotate(90deg);
+}
+
+/* File tree action buttons in tab1 - matches the "Apply & Review" button style in tab4 */
+.action-group .button {
+  background: var(--accent-color);
+  color: white;
+}
+
+.action-group .button:hover {
+  background: var(--accent-hover);
+  opacity: 0.9;
+} 

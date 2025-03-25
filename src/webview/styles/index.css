@@ -1,0 +1,24 @@
+/**
+ * Main CSS entry point that imports all modular CSS files
+ */
+
+/* CSS Variables */
+@import './variables.css';
+
+/* Global Layout */
+@import './layout.css';
+
+/* Components */
+@import './tabs.css';
+@import './cards.css';
+@import './buttons.css';
+@import './forms.css';
+
+/* Tab-specific styles */
+@import './selectfiles.css';
+@import './instructions.css';
+@import './generate.css';
+@import './merge.css';
+
+/* Utilities */
+@import './utilities.css'; 

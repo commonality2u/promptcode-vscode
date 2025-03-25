@@ -1,0 +1,74 @@
+/**
+ * Tabs - Styles for the tab navigation system
+ */
+
+/* Main tabs container */
+.tabs {
+  width: 100%;
+  margin-bottom: var(--spacing-lg);
+  padding: 0;
+}
+
+/* Container for the tab buttons */
+.tabs-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-lg);
+  background: var(--vscode-tab-inactiveBackground);
+  padding: var(--spacing-xs);
+  border-radius: var(--border-radius-md);
+}
+
+/* Individual tab button */
+.tab-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background: none;
+  border: none;
+  color: var(--vscode-tab-inactiveForeground);
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: var(--border-radius-sm);
+  transition: all var(--transition-speed) ease;
+}
+
+.tab-trigger:hover {
+  background: var(--vscode-tab-hoverBackground);
+}
+
+/* Active tab styling */
+.tab-trigger.active {
+  background: var(--vscode-tab-activeBackground);
+  color: var(--vscode-tab-activeForeground);
+  border-radius: 6px;
+}
+
+/* Tab icon styling */
+.tab-trigger svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* "Add new" tab styling */
+.tab-trigger[data-tab="add-new"] {
+  min-width: 32px;
+  padding: 6px;
+}
+
+.tab-trigger[data-tab="add-new"] svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Tab content areas */
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+} 

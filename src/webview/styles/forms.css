@@ -1,0 +1,206 @@
+/**
+ * Forms - Styles for form elements like inputs, checkboxes, and textareas
+ */
+
+/* Editor container for instruction textarea */
+.editor-container {
+  display: flex;
+  flex-direction: column;
+  border: none;
+  border-radius: 0;
+  background-color: transparent;
+  overflow: visible;
+  margin-top: 0;
+  width: 100%;
+  position: relative;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Editor toolbar */
+.editor-toolbar {
+  display: none;
+}
+
+.editor-toolbar-text {
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground);
+  margin-right: auto;
+}
+
+/* Search container */
+.search-container {
+  position: relative;
+  width: 100%;
+  margin-bottom: var(--spacing-md);
+  transition: all var(--transition-speed) ease;
+}
+
+.search-container.active-filter {
+  box-shadow: 0 0 0 2px var(--accent-color);
+  border-radius: var(--border-radius-md);
+}
+
+/* Search input */
+.search-container input {
+  width: 100%;
+  padding: 12px 40px;
+  background-color: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border);
+  border-radius: var(--border-radius-md);
+  font-size: 14px;
+  transition: all var(--transition-speed) ease;
+  height: 40px;
+  box-shadow: var(--shadow-sm);
+}
+
+.search-container input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: var(--shadow-md);
+}
+
+/* Search icons */
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  color: var(--vscode-descriptionForeground);
+}
+
+.clear-icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  color: var(--vscode-descriptionForeground);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 50%;
+  background: transparent;
+  transition: all var(--transition-speed) ease;
+}
+
+.clear-icon:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
+/* Checkbox container */
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+  cursor: pointer;
+}
+
+/* Custom checkbox */
+.custom-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--vscode-checkbox-border);
+  border-radius: 4px;
+  background-color: var(--vscode-checkbox-background);
+  transition: all var(--transition-speed) ease;
+  cursor: pointer;
+  position: relative;
+  pointer-events: auto;
+}
+
+.custom-checkbox:hover {
+  border-color: var(--accent-color);
+}
+
+.custom-checkbox.checked {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+.custom-checkbox svg {
+  width: 12px;
+  height: 12px;
+  color: white;
+  opacity: 0;
+  transition: opacity var(--transition-speed) ease;
+  pointer-events: none;
+}
+
+.custom-checkbox.checked svg {
+  opacity: 1;
+}
+
+/* Ignore textarea */
+.ignore-textarea {
+  width: 100%;
+  min-height: 180px;
+  margin-top: var(--spacing-xs);
+  padding: var(--spacing-md);
+  background-color: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border);
+  border-radius: var(--border-radius-sm);
+  font-family: var(--vscode-editor-font-family, 'Courier New', monospace);
+  font-size: 13px;
+  resize: vertical;
+}
+
+.ignore-textarea:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+/* Instruction textarea */
+.instruction-textarea {
+  width: 100%;
+  min-height: 200px;
+  padding: var(--spacing-md);
+  background-color: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border);
+  border-radius: var(--border-radius-sm);
+  font-family: var(--vscode-editor-font-family, 'Courier New', monospace);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-y: auto;
+  outline: none;
+}
+
+.instruction-textarea:empty:before {
+  content: 'Enter instructions for the prompt... use @ to embed prompt templates (docs, roles, outputs, etc.)';
+  color: var(--vscode-input-placeholderForeground);
+  font-style: italic;
+  opacity: 0.6;
+}
+
+.instruction-textarea:focus {
+  border-color: var(--accent-color);
+}
+
+/* Merge textarea */
+.merge-textarea {
+  width: 100%;
+  min-height: 200px;
+  max-height: 60vh;
+  padding: var(--spacing-md);
+  background-color: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border);
+  border-radius: var(--border-radius-sm);
+  font-family: var(--vscode-editor-font-family, 'Courier New', monospace);
+  font-size: 14px;
+  resize: vertical;
+}
+
+.merge-textarea:focus {
+  outline: none;
+  border-color: var(--accent-color);
+} 

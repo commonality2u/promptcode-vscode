@@ -1,0 +1,428 @@
+/**
+ * Select Files Tab - Styles specific to the Select Files tab
+ */
+
+/* Configuration section - Collapsible section for configuration settings */
+.configuration-section {
+  background: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-md);
+}
+
+/* Content area inside configuration sections */
+.configuration-content {
+  padding: var(--spacing-md);
+}
+
+/* Section header - Clickable toggle header for collapsible sections */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-sm) var(--spacing-md);
+  cursor: pointer;
+  border-bottom: 1px solid var(--vscode-panel-border);
+  transition: all var(--transition-speed) ease;
+}
+
+.section-header:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
+/* Toggle icon for expanding/collapsing sections */
+.toggle-icon, .collapse-icon {
+  width: 12px;
+  height: 12px;
+  transition: transform var(--transition-speed) ease;
+  color: var(--vscode-descriptionForeground);
+  /* Default state (right-pointing) when collapsed */
+  transform: rotate(0deg);
+}
+
+.section-header:hover .toggle-icon,
+.directory-header:hover .collapse-icon {
+  color: var(--vscode-foreground);
+}
+
+/* Collapsed state styles */
+.configuration-section.collapsed,
+.directory-section.collapsed {
+  border-bottom: none;
+}
+
+.configuration-section.collapsed .section-header,
+.directory-section.collapsed .directory-header {
+  border-bottom: none;
+}
+
+.configuration-section .section-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--vscode-foreground);
+}
+
+/* Expanded state - point down */
+.configuration-section:not(.collapsed) .toggle-icon,
+.directory-section:not(.collapsed) .collapse-icon {
+  transform: rotate(90deg);
+}
+
+/* Actions section - Contains file tree actions */
+.actions-section {
+  background: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-md);
+}
+
+/* Section title styling */
+.section-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--vscode-foreground);
+  margin-bottom: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+/* Groups of action buttons */
+.action-groups {
+  display: flex;
+  flex-direction: column;
+}
+
+.action-group {
+  margin-bottom: var(--spacing-md);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+/* Actions row for button groups */
+.actions-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+/* Selected files container - Main area for displaying selected files */
+.selected-files-container {
+  background: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-md);
+}
+
+/* Files header - Contains total stats and view controls */
+.files-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+/* Total stats display */
+.total-stats {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground);
+}
+
+.stat-label {
+  color: var(--vscode-foreground);
+  font-weight: 500;
+}
+
+.stat-value {
+  color: var(--vscode-descriptionForeground);
+}
+
+.stat-spacer {
+  margin: 0 var(--spacing-xs);
+}
+
+/* View mode buttons container */
+.view-mode-buttons {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+/* Directory section - Container for directory grouping */
+.directory-section {
+  background: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-md);
+}
+
+/* Directory header - Clickable header for directory sections */
+.directory-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md);
+  cursor: pointer;
+  border-bottom: 1px solid var(--vscode-panel-border);
+  transition: all var(--transition-speed) ease;
+}
+
+.directory-header:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
+/* Left and right sides of directory header */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-weight: 500;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.directory-header:hover .directory-name {
+  color: var(--accent-color);
+}
+
+/* Directory name display */
+.directory-name {
+  color: var(--vscode-foreground);
+  transition: color var(--transition-speed) ease;
+}
+
+/* Directory stats display */
+.directory-stats {
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground);
+}
+
+/* Directory files container */
+.directory-files {
+  padding: var(--spacing-md);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
+}
+
+.directory-section.collapsed .directory-files {
+  display: none;
+}
+
+/* Selected file item - Individual file card */
+.selected-file-item {
+  position: relative;
+  background: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-sm);
+  transition: all var(--transition-speed) ease;
+}
+
+.selected-file-item:hover {
+  background-color: var(--vscode-list-hoverBackground);
+  border-color: var(--accent-color);
+}
+
+/* File information container */
+.file-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  overflow: hidden;
+  width: 100%;
+}
+
+/* File header with name and actions */
+.file-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  overflow: hidden;
+  gap: var(--spacing-sm);
+  position: relative;
+}
+
+/* Container for file name and icon */
+.file-name-container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  overflow: hidden;
+  max-width: calc(100% - 40px); /* Reserve minimal space for the action icons */
+}
+
+/* File name display */
+.file-name {
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--vscode-foreground);
+}
+
+/* Token count display */
+.file-info .token-count {
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground);
+}
+
+/* File actions container */
+.file-actions {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: inline-flex;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 10;
+}
+
+.selected-file-item:hover .file-actions {
+  opacity: 1;
+}
+
+/* Make buttons completely invisible */
+.file-header .action-button {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  padding: 0 4px !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  outline: none !important;
+  cursor: pointer;
+  color: var(--vscode-descriptionForeground);
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.file-header .action-button:hover,
+.file-header .action-button:focus {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  color: var(--vscode-foreground);
+}
+
+/* Style the codicons */
+.file-header .codicon {
+  font-size: 14px;
+  line-height: 1;
+  vertical-align: middle;
+  position: relative;
+}
+
+.file-name-container .codicon {
+  margin-right: 4px;
+}
+
+/* Adjust icon alignment specifically for action buttons */
+.file-actions .codicon {
+  position: relative;
+  top: -1px;
+}
+
+/* File icon */
+.file-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Token percentage display */
+.token-percentage {
+  font-weight: 500;
+}
+
+/* Directory remove button */
+.directory-remove-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--vscode-descriptionForeground);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--border-radius-sm);
+  transition: all var(--transition-speed) ease;
+}
+
+.directory-remove-button:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
+.directory-remove-button svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Uncheck button for removing files */
+.uncheck-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--vscode-button-secondaryBackground);
+  color: var(--vscode-button-secondaryForeground);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: all var(--transition-speed) ease;
+}
+
+.selected-file-item:hover .uncheck-button {
+  opacity: 1;
+}
+
+.uncheck-button:hover {
+  background: var(--vscode-button-secondaryHoverBackground);
+}
+
+.uncheck-button svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* Selected file path */
+.selected-file-path {
+  font-size: 12px;
+  margin-bottom: var(--spacing-xs);
+  color: var(--vscode-descriptionForeground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* Selected file icon for list view */
+.selected-file-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--vscode-descriptionForeground);
+} 

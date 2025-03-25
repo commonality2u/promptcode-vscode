@@ -1,0 +1,64 @@
+/**
+ * Generate Prompt Tab - Styles specific to the Generate Prompt tab
+ */
+
+/* Prompt statistics display */
+.prompt-stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+}
+
+/* Token count display */
+.token-count-display {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: var(--border-radius-md);
+  font-size: 13px;
+}
+
+.token-count-display svg {
+  width: 14px;
+  height: 14px;
+  color: var(--vscode-descriptionForeground);
+}
+
+.token-count-display strong {
+  font-weight: 500;
+  color: var(--vscode-foreground);
+}
+
+/* Loading spinner during generation */
+.generate-spinner {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-left: var(--spacing-sm);
+}
+
+.generate-spinner .codicon {
+  font-size: 16px;
+  color: var(--vscode-foreground);
+}
+
+/* Include options - Checkboxes for including files and instructions */
+.include-options {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  background: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+}
+
+/* Adjust spacing for checkboxes in include options */
+.include-options .checkbox-container {
+  margin-bottom: 0;
+  font-size: 13px;
+} 

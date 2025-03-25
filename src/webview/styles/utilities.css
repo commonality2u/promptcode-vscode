@@ -1,0 +1,99 @@
+/**
+ * Utilities - Common utility classes used throughout the application
+ */
+
+/* Hidden element */
+.hidden {
+  display: none !important;
+}
+
+/* Generate spinner - For loading animations */
+.generate-spinner.hidden {
+  display: none;
+}
+
+/* Spinner icon animation */
+.spinner-icon {
+  animation: spin 1s linear infinite;
+  width: 16px;
+  height: 16px;
+}
+
+/* Spinner rotation animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Context menu */
+.context-menu {
+  position: absolute;
+  background: var(--vscode-menu-background);
+  border: 1px solid var(--vscode-menu-border);
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-md);
+  z-index: 100;
+  min-width: 150px;
+  display: none;
+}
+
+.context-menu.visible {
+  display: block;
+}
+
+.context-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.context-menu-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  color: var(--vscode-menu-foreground);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.context-menu-item:hover {
+  background: var(--vscode-menu-selectionBackground);
+}
+
+.context-menu-item.divider {
+  height: 1px;
+  padding: 0;
+  margin: 4px 0;
+  background: var(--vscode-menu-separatorBackground);
+  cursor: default;
+}
+
+/* SVG icons */
+svg {
+  fill: currentColor;
+}
+
+.button svg, 
+.action-button svg, 
+.file-icon svg, 
+.search-icon svg, 
+.clear-icon svg, 
+.custom-checkbox svg, 
+.toggle-icon svg, 
+.collapse-icon svg, 
+.directory-remove-button svg, 
+.uncheck-button svg,
+.view-mode-button svg,
+.token-count-display svg,
+.spinner-icon svg,
+.error-message svg {
+  display: block;
+}
+
+/* Codicon - VS Code icon font */
+.codicon {
+  font-family: codicon;
+  font-size: 16px;
+  line-height: 1;
+} 
