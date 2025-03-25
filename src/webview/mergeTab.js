@@ -304,6 +304,7 @@
               command: 'showDiff',
               filePath: filePath,
               fileCode: fileCode,
+              fileOperation: fileOperation,
               workspaceName: workspaceName,
               workspaceRoot: workspaceRoot
             });
