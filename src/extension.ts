@@ -857,7 +857,7 @@ export function activate(context: vscode.ExtensionContext) {
 	// Register show diff command
 	const showDiffCommand = vscode.commands.registerCommand('promptcode.showDiff', async (message) => {
 		try {
-			const { filePath, fileCode, fileOperation } = message;
+			const { filePath, fileCode, fileOperation, workspaceName, workspaceRoot } = message;
 			
 			// For DELETE operations, we only need the filePath and fileOperation
 			if (fileOperation && fileOperation.toUpperCase() === 'DELETE') {
@@ -870,6 +870,29 @@ export function activate(context: vscode.ExtensionContext) {
 					throw new Error('Missing required parameters');
 				}
 			}
+			
+			// Find the workspace folder for this file
+			let targetWorkspaceFolder: vscode.WorkspaceFolder | undefined;
+			
+			if (workspaceName && workspaceRoot) {
+				// Try to find the workspace folder by name and root path
+				targetWorkspaceFolder = vscode.workspace.workspaceFolders?.find(folder => 
+					folder.name === workspaceName && folder.uri.fsPath === workspaceRoot
+				);
+			}
+			
+			if (!targetWorkspaceFolder) {
+				// Fallback to finding the workspace folder by file path
+				const uri = vscode.Uri.file(path.join(workspaceRoot || '', filePath));
+				targetWorkspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
+			}
+			
+			if (!targetWorkspaceFolder) {
+				throw new Error(`Could not find workspace folder for file: ${filePath}`);
+			}
+			
+			// Construct the full file path
+			const fullPath = path.join(targetWorkspaceFolder.uri.fsPath, filePath);
 			
 			// Create a temporary file for the new content
 			const fileExtension = path.extname(filePath);
@@ -895,11 +918,11 @@ export function activate(context: vscode.ExtensionContext) {
 			// Create empty file if needed for CREATE or DELETE operations
 			fs.writeFileSync(emptyFilePath, '');
 			
-			// Use filePath directly as original file path since we know it's absolute
-			let originalFilePath = filePath;
+			// Default to UPDATE if no operation specified
+			const operation = fileOperation?.toUpperCase() || 'UPDATE';
 			
 			// Different handling based on operation type
-			if (fileOperation.toUpperCase() === 'CREATE') {
+			if (operation === 'CREATE') {
 				// For CREATE, use empty file as original
 				await vscode.commands.executeCommand('vscode.diff',
 					vscode.Uri.file(emptyFilePath),             // empty file (left)
@@ -907,34 +930,44 @@ export function activate(context: vscode.ExtensionContext) {
 					`${path.basename(filePath)} (Will be created)`,      // title
 					{ preview: true }                           // open in preview mode
 				);
-			} else if (fileOperation.toUpperCase() === 'DELETE') {
+			} else if (operation === 'DELETE') {
 				// For DELETE, check if the original file exists
-				if (!fs.existsSync(originalFilePath)) {
+				if (!fs.existsSync(fullPath)) {
 					vscode.window.showWarningMessage(`Could not find file to delete: ${filePath}. Using empty file for diff.`);
-					originalFilePath = emptyFilePath;
+					await vscode.commands.executeCommand('vscode.diff',
+						vscode.Uri.file(emptyFilePath),             // empty file (left)
+						vscode.Uri.file(emptyFilePath),             // empty file (right)
+						`${path.basename(filePath)} (Will be deleted)`,      // title
+						{ preview: true }                           // open in preview mode
+					);
+				} else {
+					// Original file (left) vs empty file (right)
+					await vscode.commands.executeCommand('vscode.diff',
+						vscode.Uri.file(fullPath),                 // original file (left)
+						vscode.Uri.file(emptyFilePath),             // empty file (right)
+						`${path.basename(filePath)} (Will be deleted)`,      // title
+						{ preview: true }                           // open in preview mode
+					);
 				}
-				
-				// Original file (left) vs empty file (right)
-				await vscode.commands.executeCommand('vscode.diff',
-					vscode.Uri.file(originalFilePath),          // original file (left)
-					vscode.Uri.file(emptyFilePath),             // empty file (right)
-					`${path.basename(filePath)} (Will be deleted)`,      // title
-					{ preview: true }                           // open in preview mode
-				);
 			} else {
 				// For UPDATE, check if the original file exists
-				if (!fs.existsSync(originalFilePath)) {
+				if (!fs.existsSync(fullPath)) {
 					vscode.window.showWarningMessage(`Could not find file to update: ${filePath}. Showing diff as if creating a new file.`);
-					originalFilePath = emptyFilePath;
+					await vscode.commands.executeCommand('vscode.diff',
+						vscode.Uri.file(emptyFilePath),             // empty file (left)
+						vscode.Uri.file(tempFilePath),              // modified file (right)
+						`${path.basename(filePath)} (Original ↔ Modified)`,  // title
+						{ preview: true }                           // open in preview mode
+					);
+				} else {
+					// Original file (left) vs modified file (right)
+					await vscode.commands.executeCommand('vscode.diff',
+						vscode.Uri.file(fullPath),                 // original file (left)
+						vscode.Uri.file(tempFilePath),              // modified file (right)
+						`${path.basename(filePath)} (Original ↔ Modified)`,  // title
+						{ preview: true }                           // open in preview mode
+					);
 				}
-				
-				// Original file (left) vs modified file (right)
-				await vscode.commands.executeCommand('vscode.diff',
-					vscode.Uri.file(originalFilePath),          // original file (left)
-					vscode.Uri.file(tempFilePath),              // modified file (right)
-					`${path.basename(filePath)} (Original ↔ Modified)`,  // title
-					{ preview: true }                           // open in preview mode
-				);
 			}
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : String(error);
@@ -997,7 +1030,13 @@ function isValidIncludeOptions(options: any): options is { files: boolean; instr
 
 // Helper function to generate prompt
 async function generatePrompt(
-	selectedFiles: { path: string; tokenCount: number; workspaceFolderRootPath?: string; absolutePath?: string }[], 
+	selectedFiles: { 
+		path: string; 
+		tokenCount: number; 
+		workspaceFolderRootPath?: string; 
+		absolutePath?: string;
+		workspaceFolderName?: string;
+	}[], 
 	instructions: string,
 	includeOptions: { files: boolean; instructions: boolean } 
 ): Promise<string> {
@@ -1153,12 +1192,21 @@ async function generatePrompt(
 			// Find the original file to get the workspace folder path
 			const originalFile = selectedFiles.find(f => f.path === file.path);
 			let fullPath = file.path;
+			let workspaceName = '';
+			let workspaceRoot = '';
+			let relPath = file.path; // Default to the path we already have
 			
-			// Construct the full path if we have workspace folder information
+			// Get workspace information if available
 			if (originalFile?.workspaceFolderRootPath) {
 				fullPath = path.join(originalFile.workspaceFolderRootPath, file.path);
+				workspaceName = originalFile.workspaceFolderName || '';
+				workspaceRoot = originalFile.workspaceFolderRootPath;
+				relPath = file.path; // This is already the relative path
 			}
 			
+			prompt += `workspace_name: ${workspaceName}\n`;
+			prompt += `workspace_root: ${workspaceRoot}\n`;
+			prompt += `rel_path: ${relPath}\n`;
 			prompt += `full_filepath: ${fullPath}\n\`\`\`${path.extname(file.path).substring(1)}\n${file.content}\n\`\`\`\n\n`;
 		}
 		prompt += '</files>';
@@ -1166,7 +1214,9 @@ async function generatePrompt(
 	
 	// Add instructions if they exist and are to be included
 	if (instructions?.trim() && includeOptions.instructions) {
-		if (prompt) prompt += '\n';
+		if (prompt) {
+			prompt += '\n';
+		}
 		prompt += '<user_instructions>\n';
 		prompt += instructions.trim();
 		prompt += '\n</user_instructions>\n';
@@ -1179,7 +1229,13 @@ async function generatePrompt(
 }
 
 // Helper function to get selected files with content
-async function getSelectedFilesWithContent(): Promise<any[]> {
+async function getSelectedFilesWithContent(): Promise<{
+	path: string;
+	tokenCount: number;
+	workspaceFolderRootPath?: string;
+	absolutePath?: string;
+	workspaceFolderName?: string;
+}[]> {
 	if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
 		throw new Error('No workspace folder is open');
 	}
