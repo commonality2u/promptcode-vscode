@@ -1,6 +1,6 @@
 ---
 description: Perform a code review
-category: Code Review
+category: Code Research
 ---
 Please perform a thorough code review of the provided code. Focus on:
 1. Code quality and potential bugs
