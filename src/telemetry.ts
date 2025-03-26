@@ -5,7 +5,27 @@ import * as fs from 'fs';
 
 // Connection string should be stored in a secure location and not hard-coded
 // For development, we'll use a placeholder that you should replace with your actual connection string
-const CONNECTION_STRING = ''; // Your Application Insights connection string goes here
+const CONNECTION_STRING = ''; // This will be injected during the build process
+
+// Function to get connection string from environment in debug mode
+function getConnectionString(): string {
+    // First check if we have an injected connection string (used in production)
+    if (CONNECTION_STRING) {
+        console.log('[TELEMETRY] Using injected connection string');
+        return CONNECTION_STRING;
+    }
+    
+    // If no injected string, fall back to environment variable (used in debug mode)
+    const envConnectionString = process.env.PROMPTCODE_TELEMETRY_CONNECTION_STRING;
+    if (envConnectionString) {
+        console.log('[TELEMETRY] Using connection string from environment variable (debug mode)');
+        return envConnectionString;
+    }
+    
+    // If neither is available, log a warning
+    console.log('[TELEMETRY] No connection string found - telemetry will be disabled');
+    return '';
+}
 
 export class TelemetryService {
     private static instance: TelemetryService;
@@ -13,8 +33,14 @@ export class TelemetryService {
     private extensionId: string = 'cogflows.promptcode';
     private extensionVersion: string = '0.0.0';
     private isEnabled: boolean = true; // Only used for our custom extension setting
+    private connectionString: string;
 
     private constructor(context: vscode.ExtensionContext) {
+        console.log('[TELEMETRY] Initializing TelemetryService');
+        
+        // Get the connection string at runtime
+        this.connectionString = getConnectionString();
+        
         // Get extension version from package.json
         try {
             const packageJsonPath = path.join(context.extensionPath, 'package.json');
@@ -22,18 +48,24 @@ export class TelemetryService {
                 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
                 this.extensionId = `${packageJson.publisher}.${packageJson.name}`;
                 this.extensionVersion = packageJson.version;
+                console.log(`[TELEMETRY] Loaded extension info: ${this.extensionId}@${this.extensionVersion}`);
             }
         } catch (error) {
-            console.error('Failed to read package.json:', error);
+            console.error('[TELEMETRY] Failed to read package.json:', error);
         }
 
         // Initialize the telemetry reporter if we have a connection string
-        if (CONNECTION_STRING) {
-            this.reporter = new TelemetryReporter(CONNECTION_STRING);
-            context.subscriptions.push(this.reporter);
-            console.log(`Telemetry reporter initialized with connection string: ${CONNECTION_STRING ? 'present' : 'missing'}`);
+        if (this.connectionString) {
+            try {
+                console.log('[TELEMETRY] Connection string available, creating reporter');
+                this.reporter = new TelemetryReporter(this.connectionString);
+                context.subscriptions.push(this.reporter);
+                console.log('[TELEMETRY] Reporter initialized successfully');
+            } catch (error) {
+                console.error('[TELEMETRY] Failed to initialize reporter:', error);
+            }
         } else {
-            console.log('Telemetry disabled: No connection string available');
+            console.log('[TELEMETRY] Telemetry disabled: No connection string available');
         }
 
         // Check if telemetry is disabled in extension settings
@@ -48,9 +80,13 @@ export class TelemetryService {
                 }
             })
         );
+        
+        console.log(`[TELEMETRY] TelemetryService initialization complete. Enabled: ${this.isEnabled}, Reporter: ${!!this.reporter}`);
     }
 
     private updateExtensionTelemetrySetting(): void {
+        console.log('[TELEMETRY] Checking telemetry setting configuration');
+        
         // Get the previous value to detect changes
         const previousValue = this.isEnabled;
         
@@ -58,7 +94,9 @@ export class TelemetryService {
         this.isEnabled = vscode.workspace.getConfiguration('promptcode').get<boolean>('enableTelemetry', true);
         
         if (previousValue !== this.isEnabled) {
-            console.log(`PromptCode telemetry setting changed: ${this.isEnabled ? 'enabled' : 'disabled'}`);
+            console.log(`[TELEMETRY] Setting changed: ${this.isEnabled ? 'enabled' : 'disabled'}`);
+        } else {
+            console.log(`[TELEMETRY] Setting unchanged: ${this.isEnabled ? 'enabled' : 'disabled'}`);
         }
     }
 
@@ -80,10 +118,15 @@ export class TelemetryService {
         properties?: { [key: string]: string }, 
         measurements?: { [key: string]: number }
     ): void {
+        // Add detailed logging for debugging
+        console.log(`[TELEMETRY] Attempting to send event: ${eventName}`);
+        
         // Check the current setting value before sending
         const currentSettingEnabled = vscode.workspace.getConfiguration('promptcode').get<boolean>('enableTelemetry', true);
         
         if (currentSettingEnabled && this.isEnabled && this.reporter) {
+            console.log(`[TELEMETRY] Settings validated - sending event: ${eventName}`);
+            
             // Add standard properties
             const allProperties = {
                 ...properties,
@@ -91,7 +134,14 @@ export class TelemetryService {
                 'extensionVersion': this.extensionVersion
             };
             
-            this.reporter.sendTelemetryEvent(eventName, allProperties, measurements);
+            try {
+                this.reporter.sendTelemetryEvent(eventName, allProperties, measurements);
+                console.log(`[TELEMETRY] Event sent successfully: ${eventName}`);
+            } catch (error) {
+                console.error(`[TELEMETRY] Failed to send event: ${eventName}`, error);
+            }
+        } else {
+            console.log(`[TELEMETRY] Event not sent (disabled): ${eventName} | Reasons: Setting=${currentSettingEnabled}, Enabled=${this.isEnabled}, Reporter=${!!this.reporter}`);
         }
     }
 
@@ -106,27 +156,39 @@ export class TelemetryService {
         properties?: { [key: string]: string }, 
         measurements?: { [key: string]: number }
     ): void {
+        // Add detailed logging for debugging
+        console.log(`[TELEMETRY] Attempting to send error: ${typeof error === 'string' ? error : error.name}`);
+        
         // Check the current setting value before sending
         const currentSettingEnabled = vscode.workspace.getConfiguration('promptcode').get<boolean>('enableTelemetry', true);
         
         if (currentSettingEnabled && this.isEnabled && this.reporter) {
-            if (typeof error === 'string') {
-                // Handle case where error is just a string
-                this.reporter.sendTelemetryErrorEvent(error, {
-                    ...properties,
-                    'timestamp': new Date().toISOString(),
-                    'extensionVersion': this.extensionVersion
-                }, measurements);
-            } else {
-                // Handle case where error is an Error object
-                this.reporter.sendTelemetryErrorEvent(error.name, {
-                    ...properties,
-                    'message': error.message,
-                    'stack': error.stack || '',
-                    'timestamp': new Date().toISOString(),
-                    'extensionVersion': this.extensionVersion
-                }, measurements);
+            console.log(`[TELEMETRY] Settings validated - sending error: ${typeof error === 'string' ? error : error.name}`);
+            
+            try {
+                if (typeof error === 'string') {
+                    // Handle case where error is just a string
+                    this.reporter.sendTelemetryErrorEvent(error, {
+                        ...properties,
+                        'timestamp': new Date().toISOString(),
+                        'extensionVersion': this.extensionVersion
+                    }, measurements);
+                } else {
+                    // Handle case where error is an Error object
+                    this.reporter.sendTelemetryErrorEvent(error.name, {
+                        ...properties,
+                        'message': error.message,
+                        'stack': error.stack || '',
+                        'timestamp': new Date().toISOString(),
+                        'extensionVersion': this.extensionVersion
+                    }, measurements);
+                }
+                console.log(`[TELEMETRY] Error event sent successfully: ${typeof error === 'string' ? error : error.name}`);
+            } catch (sendError) {
+                console.error(`[TELEMETRY] Failed to send error event: ${typeof error === 'string' ? error : error.name}`, sendError);
             }
+        } else {
+            console.log(`[TELEMETRY] Error event not sent (disabled): ${typeof error === 'string' ? error : error.name} | Reasons: Setting=${currentSettingEnabled}, Enabled=${this.isEnabled}, Reporter=${!!this.reporter}`);
         }
     }
 
@@ -137,5 +199,37 @@ export class TelemetryService {
     public isTelemetryEnabled(): boolean {
         // Always get the fresh value from settings
         return vscode.workspace.getConfiguration('promptcode').get<boolean>('enableTelemetry', true) && this.isEnabled;
+    }
+    
+    /**
+     * Get a diagnostic report of the telemetry system status
+     * Useful for debugging telemetry issues
+     */
+    public getTelemetryStatus(): string {
+        const vscodeTelemetrySetting = vscode.workspace.getConfiguration('telemetry').get<string>('telemetryLevel', 'all');
+        const extensionTelemetrySetting = vscode.workspace.getConfiguration('promptcode').get<boolean>('enableTelemetry', true);
+        
+        return JSON.stringify({
+            hasConnectionString: !!this.connectionString,
+            connectionStringLength: typeof this.connectionString === 'string' ? this.connectionString.length : 0,
+            reporterInitialized: !!this.reporter,
+            extensionTelemetryEnabled: this.isEnabled,
+            extensionSettingValue: extensionTelemetrySetting,
+            vscodeTelemetryLevel: vscodeTelemetrySetting,
+            effectivelyEnabled: this.isEnabled && !!this.reporter && !!this.connectionString && vscodeTelemetrySetting !== 'off',
+            extensionInfo: {
+                id: this.extensionId,
+                version: this.extensionVersion
+            }
+        }, null, 2);
+    }
+    
+    /**
+     * Log telemetry status to console
+     * Useful for debugging telemetry issues
+     */
+    public logTelemetryStatus(): void {
+        console.log('[TELEMETRY] Status Report:');
+        console.log(this.getTelemetryStatus());
     }
 } 

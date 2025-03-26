@@ -18,11 +18,14 @@ import { TelemetryService } from './telemetry';
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-	console.log('PromptCode extension activated');
+	console.log('Activating PromptCode extension');
 
 	// Initialize telemetry service
 	const telemetryService = TelemetryService.getInstance(context);
 	telemetryService.sendTelemetryEvent('extension_activated');
+	
+	// Log telemetry status during activation to aid debugging
+	telemetryService.logTelemetryStatus();
 
 	// Initialize token counter with global storage path
 	if (context.globalStorageUri) {
@@ -1037,6 +1040,28 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	// Register all commands
+	const commandHandlers = {
+		'promptcode.showFileSelector': () => promptCodeProvider.showWebView(),
+		'promptcode.showPromptCodeView': () => promptCodeProvider.showWebView(),
+		'promptcode.generatePrompt': generatePrompt,
+		'promptcode.selectAll': selectAllCommand,
+		'promptcode.deselectAll': deselectAllCommand,
+		'promptcode.copyToClipboard': copyToClipboardCommand,
+		'promptcode.clearTokenCache': clearTokenCacheCommand,
+		'promptcode.refreshFileExplorer': refreshFileExplorerCommand,
+		'promptcode.copyFilePath': copyFilePathCommand,
+		'promptcode.copyRelativeFilePath': copyRelativeFilePathCommand,
+		'promptcode.openFileInEditor': openFileInEditorCommand,
+		// Add a new debug command for telemetry status
+		'promptcode.checkTelemetryStatus': () => {
+			const status = TelemetryService.getInstance().getTelemetryStatus();
+			vscode.window.showInformationMessage('Telemetry Status', { modal: true, detail: status });
+			console.log('[DEBUG] Telemetry status report:');
+			console.log(status);
+			return status;
+		}
+	};
+
 	context.subscriptions.push(
 		showPromptCodeViewCommand,
 		filterFilesCommand,
@@ -1065,7 +1090,8 @@ export function activate(context: vscode.ExtensionContext) {
 		openFileInEditorCommand,
 		showNewContentCommand,
 		showDiffCommand,
-		debugRefreshSelectedFilesCommand
+		debugRefreshSelectedFilesCommand,
+		vscode.commands.registerCommand('promptcode.checkTelemetryStatus', commandHandlers['promptcode.checkTelemetryStatus'])
 	);
 }
 
