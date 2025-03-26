@@ -3,26 +3,15 @@ import TelemetryReporter from '@vscode/extension-telemetry';
 import * as path from 'path';
 import * as fs from 'fs';
 
-// Connection string should be stored in a secure location and not hard-coded
-// For development, we'll use a placeholder that you should replace with your actual connection string
-const CONNECTION_STRING = ''; // This will be injected during the build process
-
-// Function to get connection string from environment in debug mode
+// Function to get connection string
 function getConnectionString(): string {
-    // First check if we have an injected connection string (used in production)
-    if (CONNECTION_STRING) {
-        console.log('[TELEMETRY] Using injected connection string');
-        return CONNECTION_STRING;
+    // Only use the global TELEMETRY_CONNECTION_STRING
+    if (typeof TELEMETRY_CONNECTION_STRING === 'string' && TELEMETRY_CONNECTION_STRING) {
+        console.log('[TELEMETRY] Using globally defined connection string');
+        return TELEMETRY_CONNECTION_STRING;
     }
     
-    // If no injected string, fall back to environment variable (used in debug mode)
-    const envConnectionString = process.env.PROMPTCODE_TELEMETRY_CONNECTION_STRING;
-    if (envConnectionString) {
-        console.log('[TELEMETRY] Using connection string from environment variable (debug mode)');
-        return envConnectionString;
-    }
-    
-    // If neither is available, log a warning
+    // If not available or empty, log a message and disable telemetry
     console.log('[TELEMETRY] No connection string found - telemetry will be disabled');
     return '';
 }

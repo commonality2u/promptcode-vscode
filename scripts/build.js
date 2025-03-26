@@ -5,7 +5,7 @@ const { existsSync } = require('fs');
 const path = require('path');
 const fs = require('fs');
 
-// Get telemetry connection string from config file or environment
+// Get telemetry connection string from config file only
 let telemetryConnectionString = '';
 const telemetryConfigPath = path.join(__dirname, '.telemetry-config.json');
 
@@ -24,15 +24,7 @@ if (existsSync(telemetryConfigPath)) {
     console.error('Error reading scripts/.telemetry-config.json:', error.message);
   }
 } else {
-  console.log('scripts/.telemetry-config.json not found, checking environment variable');
-}
-
-// Use environment variable as fallback
-if (!telemetryConnectionString) {
-  telemetryConnectionString = process.env.PROMPTCODE_TELEMETRY_CONNECTION_STRING || '';
-  if (telemetryConnectionString) {
-    console.log('Using telemetry connection string from environment variable');
-  }
+  console.log('scripts/.telemetry-config.json not found - telemetry will be disabled');
 }
 
 // Parse arguments
@@ -79,7 +71,7 @@ esbuild.build({
   legalComments: 'none',
   define: {
     'process.env.NODE_ENV': isPublishBuild ? '"production"' : '"development"',
-    'CONNECTION_STRING': JSON.stringify(telemetryConnectionString)
+    'TELEMETRY_CONNECTION_STRING': JSON.stringify(telemetryConnectionString)
   },
   // Add any legal comments or copyright notices at the top of the file
   banner: {
@@ -133,7 +125,7 @@ esbuild.build({
     legalComments: 'none',
     define: {
       'process.env.NODE_ENV': isPublishBuild ? '"production"' : '"development"',
-      'CONNECTION_STRING': JSON.stringify(telemetryConnectionString)
+      'TELEMETRY_CONNECTION_STRING': JSON.stringify(telemetryConnectionString)
     },
     banner: {
       js: '/* PromptCode - Copyright (C) 2025. All Rights Reserved. */',

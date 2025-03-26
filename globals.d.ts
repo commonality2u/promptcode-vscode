@@ -1,0 +1,1 @@
+declare const TELEMETRY_CONNECTION_STRING: string | undefined; 
