@@ -160,14 +160,13 @@
   },
   "scripts": {
     "vscode:prepublish": "node ./scripts/build.js --minify --publish && node ./scripts/inject-telemetry.js",
-    "compile": "node ./scripts/build.js",
+    "compile": "node ./scripts/build.js && node ./scripts/inject-telemetry.js",
     "watch": "node ./scripts/watch.js",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
     "test": "vscode-test",
     "build:prod": "node ./scripts/build.js --minify --publish && node ./scripts/inject-telemetry.js",
-    "build:dev": "node ./scripts/build.js",
-    "build:with-telemetry": "node ./scripts/build-with-telemetry.js"
+    "build:dev": "node ./scripts/build.js"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
