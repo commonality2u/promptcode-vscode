@@ -36,3 +36,4 @@ coverage/
 
 # Telemetry configuration
 scripts/.telemetry-config.json
+.telemetry-config.json

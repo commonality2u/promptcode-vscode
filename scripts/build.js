@@ -5,9 +5,46 @@ const { existsSync } = require('fs');
 const path = require('path');
 const fs = require('fs');
 
+// Get telemetry connection string from config file or environment
+let telemetryConnectionString = '';
+const telemetryConfigPath = path.join(__dirname, '.telemetry-config.json');
+
+if (existsSync(telemetryConfigPath)) {
+  try {
+    const configContent = fs.readFileSync(telemetryConfigPath, 'utf8');
+    const config = JSON.parse(configContent);
+    telemetryConnectionString = config.connectionString || '';
+    
+    if (telemetryConnectionString) {
+      console.log('Using telemetry connection string from scripts/.telemetry-config.json');
+    } else {
+      console.log('No connection string found in scripts/.telemetry-config.json');
+    }
+  } catch (error) {
+    console.error('Error reading scripts/.telemetry-config.json:', error.message);
+  }
+} else {
+  console.log('scripts/.telemetry-config.json not found, checking environment variable');
+}
+
+// Use environment variable as fallback
+if (!telemetryConnectionString) {
+  telemetryConnectionString = process.env.PROMPTCODE_TELEMETRY_CONNECTION_STRING || '';
+  if (telemetryConnectionString) {
+    console.log('Using telemetry connection string from environment variable');
+  }
+}
+
 // Parse arguments
 const shouldMinify = process.argv.includes('--minify');
 const isPublishBuild = process.argv.includes('--publish') || process.env.NODE_ENV === 'production';
+
+// Check for connection string in production builds
+if (isPublishBuild && !telemetryConnectionString) {
+  console.warn('WARNING: Building for production without a telemetry connection string');
+  console.warn('Telemetry will be disabled in this build');
+  console.warn('To enable telemetry, create a scripts/.telemetry-config.json file with a connectionString property');
+}
 
 // Remove any existing map files if this is a publish build
 if (isPublishBuild && existsSync('out')) {
@@ -41,7 +78,8 @@ esbuild.build({
   treeShaking: true,
   legalComments: 'none',
   define: {
-    'process.env.NODE_ENV': isPublishBuild ? '"production"' : '"development"'
+    'process.env.NODE_ENV': isPublishBuild ? '"production"' : '"development"',
+    'CONNECTION_STRING': JSON.stringify(telemetryConnectionString)
   },
   // Add any legal comments or copyright notices at the top of the file
   banner: {
@@ -94,7 +132,8 @@ esbuild.build({
     format: 'iife', // Use IIFE for browser compatibility
     legalComments: 'none',
     define: {
-      'process.env.NODE_ENV': isPublishBuild ? '"production"' : '"development"'
+      'process.env.NODE_ENV': isPublishBuild ? '"production"' : '"development"',
+      'CONNECTION_STRING': JSON.stringify(telemetryConnectionString)
     },
     banner: {
       js: '/* PromptCode - Copyright (C) 2025. All Rights Reserved. */',
