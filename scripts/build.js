@@ -9,6 +9,24 @@ const fs = require('fs');
 const shouldMinify = process.argv.includes('--minify');
 const isPublishBuild = process.argv.includes('--publish') || process.env.NODE_ENV === 'production';
 
+// Remove any existing map files if this is a publish build
+if (isPublishBuild && existsSync('out')) {
+  console.log('Cleaning up source map files for production build...');
+  const removeMapFiles = (dir) => {
+    readdirSync(dir, { withFileTypes: true }).forEach(entry => {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        removeMapFiles(fullPath);
+      } else if (entry.name.endsWith('.map')) {
+        console.log(`Removing source map: ${fullPath}`);
+        unlinkSync(fullPath);
+      }
+    });
+  };
+  
+  removeMapFiles(path.join(__dirname, '..', 'out'));
+}
+
 // Build the extension
 esbuild.build({
   entryPoints: ['src/extension.ts', 'src/telemetry.ts'],
